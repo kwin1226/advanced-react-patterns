@@ -6,6 +6,7 @@ import {Switch} from '../switch'
 import {createContext} from 'react'
 
 const ToggleContext = createContext()
+ToggleContext.displayName = 'ToggleContext';
 
 function Toggle(props) {
   const [on, setOn] = React.useState(false)
@@ -14,20 +15,31 @@ function Toggle(props) {
   return <ToggleContext.Provider value={{on, toggle}} {...props} />
 }
 
+const useToggle = () => {
+  const context = React.useContext(ToggleContext)
+  if (!!!context) {
+    throw new Error('useToggle must be used within a <Toggle>!')
+  } else {
+    return context
+  }
+}
+
 function ToggleOn({children}) {
-  const {on} = React.useContext(ToggleContext)
+  const {on} = useToggle()
   return on ? children : null
 }
 
 function ToggleOff({children}) {
-  const {on} = React.useContext(ToggleContext)
+  const {on} = useToggle()
   return on ? null : children
 }
 
 function ToggleButton({...props}) {
-  const {on, toggle} = React.useContext(ToggleContext)
+  const {on, toggle} = useToggle()
   return <Switch on={on} onClick={toggle} {...props} />
 }
+
+// const App = () => <ToggleButton />
 
 function App() {
   return (
